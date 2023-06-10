@@ -5,28 +5,27 @@
 
 int main(){
     t_tabuleiro tab;
-    int cor, x, y, i;
-    int quadrados_faltantes;
-    t_jogada melhor_jogada;
+    int cor;
     tab = le_tabuleiro();
 
-    // printa_tabuleiro(&tab);
+    cor = 10;
+    pinta_flood(&tab, &cor);
+    pinta_tabuleiro(&tab, 0, 0, &cor);
 
-    quadrados_faltantes = (tab.col * tab.lin) - 1;
-    i = 0;
+    cor = 7;
+    pinta_flood(&tab, &cor);
+    pinta_tabuleiro(&tab, 0, 0, &cor);
 
-    while(i < 5){
+    cor = 3;
+    pinta_flood(&tab, &cor);
+    pinta_tabuleiro(&tab, 0, 0, &cor);
 
-        pinta_flood(&tab, &melhor_jogada.cor);
+    cor = 6;
+    pinta_flood(&tab, &cor);
+    pinta_tabuleiro(&tab, 0, 0, &cor);
 
-        fprintf(stdout, "MELHOR COR: %d -- MELHOR QUINA: %c \n", melhor_jogada.cor, melhor_jogada.quina);
-
-        pinta_tabuleiro(&tab, x, y, &melhor_jogada.cor);
-        i++;
-        quadrados_faltantes = melhor_jogada.quadrado;
-    }
-    
     printa_tabuleiro(&tab);
+
 
     return 0;
 }
