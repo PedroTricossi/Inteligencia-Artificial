@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "flood_it.h": "c",
+        "stdlib.h": "c"
+    }
+}
