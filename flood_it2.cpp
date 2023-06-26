@@ -15,8 +15,13 @@ t_tabuleiro le_tabuleiro() {
     t_tabuleiro tab;
     FILE* tabuleiro;
 
+    cout << "oiiiiii";
+
     // printf("Enter filename: ");
-    scanf("%s", filename);
+    // scanf("%s", filename);
+    fgets(filename, 1024, stdin);
+
+    cout << "oiiiiii";
 
     tabuleiro = fopen(filename, "r");
     if (tabuleiro == NULL) {
@@ -24,24 +29,34 @@ t_tabuleiro le_tabuleiro() {
         exit(1);
     }
 
+    cout << "oiiiiii";
+
     if (fscanf(tabuleiro, "%d%d%d", &tab.lin, &tab.col, &tab.cor) != 3) {
         printf("Invalid file format.\n");
         exit(1);
     }
 
+    cout << "reconheceu o arquivo ao menos";
+
     // tab.tab = malloc(tab.lin * sizeof(t_cell*));
-    tab.tab = new t_cell*[tab.lin];
+    tab.tab = (t_cell**)malloc(tab.lin * sizeof(t_cell*));
+    // tab.tab = new t_cell*[tab.lin];
     if (tab.tab == NULL) {
         printf("Memory allocation error.\n");
         exit(1);
     }
 
+    cout << "alocou parcialmente";
+
     // tab.tab[0] = malloc(tab.lin * tab.col * sizeof(t_cell));
-    tab.tab[0] = new t_cell[tab.lin * tab.col];
+    tab.tab[0] = (t_cell*)malloc(tab.lin * tab.col * sizeof(t_cell));
+    // tab.tab[0] = new t_cell[tab.lin * tab.col];
     if (tab.tab[0] == NULL) {
         printf("Memory allocation error.\n");
         exit(1);
     }
+
+    cout << "alocou a memoria da matriz";
 
     for (i = 1; i < tab.lin; i++)
         tab.tab[i] = tab.tab[0] + i * tab.col;
@@ -132,6 +147,9 @@ void mat2graph(t_tabuleiro& tab, vector<t_vertice>& grafo)
                 vert.indice = static_cast<int>(grafo.size());
                 vert.cor = tab.tab[i][j].cor;
                 vert.area = 1;
+                vert.distancias.push_back(-1);
+                vert.distancias.push_back(-1);
+                vert.distancias.push_back(-1);
 
                 // anota se o vértice contém algum dos cantos
                 if (i == 0 && j == tab.col-1) vert.distancias[0] = 0;

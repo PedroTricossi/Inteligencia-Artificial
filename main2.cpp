@@ -23,8 +23,10 @@ int main(){
     t_tabuleiro tab;
  
     tab = le_tabuleiro();
+    cout << "tabuleiro matriz feito";
 
     mat2graph(tab, grafotab.grafo);
+    cout << "tabuleiro grafo feito";
 
     // dijkstra cantos
     // SD = 0
@@ -32,10 +34,6 @@ int main(){
     // ID = 2
     for (t_vertice vert : grafotab.grafo)
     {
-        vert.distancias.push_back(-1);
-        vert.distancias.push_back(-1);
-        vert.distancias.push_back(-1);
-
         vert.visitado = 0;
 
         if (vert.distancias[0] == 0)
@@ -51,7 +49,7 @@ int main(){
             dijkstra(vert.indice, grafotab.grafo, 2);
         }
     }
-
+    cout << "passou dos dijkstra";
 
     // guarda quantos componentes de cada cor ainda restam
     // e também quantos componentes restam
@@ -68,6 +66,7 @@ int main(){
     // area total do tabuleiro
     int area = tab.lin * tab.col;
 
+    cout << "contadores setados";
 
     // gera sequencias de jogadas
     vector<t_grafo_tabuleiro> grafos_tentativas; // grafos gerados apos considerar n jogadas, e as jogadas correspondentes
@@ -84,6 +83,8 @@ int main(){
 
         gera_grafos1(tentativa, grafotab, grafos_tentativas, tab.cor, PROFUNDIDADE);
     }
+
+    cout << "sequencias iniciais geradas";
 
 
     // avaliar grafos gerados com a heurística
@@ -119,6 +120,8 @@ int main(){
     // guarda a melhor jogada
     jogadas.push_back(melhor.first);
 
+    cout << "melhor jogada avaliada";
+
     // eliminar os ruins
     vector<int> ruins;
     for (int t=0; t < static_cast<int>(grafos_tentativas.size()); t++)
@@ -133,6 +136,7 @@ int main(){
     for (int r : ruins)
         grafos_tentativas.erase(grafos_tentativas.begin() + r);
 
+    cout << "jogadas ruins descartadas";
 
     // gerar novo passo para os grafos que restaram
     // avaliar novos passos
@@ -141,6 +145,8 @@ int main(){
     // ate acabar o jogo
     while(!fim)
     {
+        cout << "entrou no loop";
+
         int tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
         for (int c=1; c <= tab.cor; c++)
         {
@@ -173,6 +179,8 @@ int main(){
         for (int i=0; i < tam_tentativas; i++)
             grafos_tentativas.erase(grafos_tentativas.begin() + i);
 
+        cout << "definiu as proximas jogadas a serem avaliadas";
+
 
         // avaliar grafos gerados com a heurística
         pair<int, int> melhor = make_pair(1, INT_MAX); // cor, pontuacao. Quanto menor a pontuacao, melhor
@@ -186,6 +194,8 @@ int main(){
                 melhor.second = avaliacao;
             }
         }
+
+        cout << "avaliadas dentro do loop";
 
         // guarda a melhor jogada
         jogadas.push_back(melhor.first);
@@ -204,6 +214,8 @@ int main(){
         for (int r : ruins)
             grafos_tentativas.erase(grafos_tentativas.begin() + r);
         
+        cout << "ruins descartadas no loop";
+
     }
 
     // saiu do loop = achou sequencia vencedora
