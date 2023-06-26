@@ -39,7 +39,7 @@ typedef struct
 }t_grafo_tabuleiro;
 
 
-t_tabuleiro le_tabuleiro();
+t_tabuleiro le_tabuleiro(const char* filename);
 
 int verifica_borda(t_tabuleiro *tab, int *x, int *y);
 

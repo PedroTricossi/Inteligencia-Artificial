@@ -17,12 +17,12 @@ t_grafo_tabuleiro grafotab;
 
 vector<int> jogadas;
 
-int main(){
+int main(int argc, char* argv[]){
     int fim = 0;
 
     t_tabuleiro tab;
  
-    tab = le_tabuleiro();
+    tab = le_tabuleiro(argv[1]);
     // cout << "tabuleiro matriz feito!!";
 
     mat2graph(tab, grafotab.grafo);

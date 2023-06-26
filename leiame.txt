@@ -1,6 +1,8 @@
 # Inteligencia-Artificial
 Diretório criado para os trabalhos da disciplina de Inteligência Artificial da UFPR
 
+para executar: ./flood <arquivo_de_entrada>
+
 a implementação é feita com grafos, e faz uso de uma combinação de heurísticas (uma soma com pesos): 
 
 métricas heurísticas:

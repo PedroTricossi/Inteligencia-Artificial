@@ -9,16 +9,16 @@
 using namespace std;
 
 // Cria um tabuleiro de flood-it usando como base as informacoes do enunciado do trabalho
-t_tabuleiro le_tabuleiro() {
-    char filename[1024];
+t_tabuleiro le_tabuleiro(const char* filename) {
+    // char filename[1024];
     int i, j;
     t_tabuleiro tab;
     FILE* tabuleiro;
 
     // cout << "oiiiiii";
 
-    printf("Digite o nome do arquivo: ");
-    scanf("%s", filename);
+    // printf("Digite o nome do arquivo: ");
+    // scanf("%s", filename);
     // fgets(filename, 1024, stdin);
 
     // cout << "oiiiiii";
