@@ -30,12 +30,6 @@ typedef struct
     t_cell **tab;
 }t_tabuleiro;
 
-typedef struct
-{
-    vector<int> passos;
-    vector<t_vertice> grafo;
-}t_tentativa;
-
 typedef struct 
 {
     vector<int> passos;

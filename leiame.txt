@@ -4,12 +4,12 @@ Diretório criado para os trabalhos da disciplina de Inteligência Artificial da
 a implementação é feita com grafos, e faz uso de uma combinação de heurísticas (uma soma com pesos): 
 
 métricas heurísticas:
-    distância canto superior direito
-    distância canto inferior esquerdo (esse e o anterior são relevantes tb, uma vez que chegar no ID)
-    distância canto inferior direito
-    área pintada
-    quantidade de vértices pintados
-    cores restantes (importante no fim do jogo, pois reduzir uma cor é muito valioso)
+    distância canto superior direito (peso 1)
+    distância canto inferior esquerdo (esse e o anterior são relevantes tb, uma vez que chegar no ID) (peso 1)
+    distância canto inferior direito (peso 2)
+    área pintada (peso 1)
+    quantidade de vértices pintados (peso 1)
+    cores restantes (importante no fim do jogo, pois reduzir uma cor é muito valioso) (peso 5)
 
 Para as distâncias: é executado dijkstra a partir de cada um dos cantos. Com isso,
 é possível obter a distância mínima do canto superior esquerdo para cada um dos  

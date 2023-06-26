@@ -282,10 +282,10 @@ int avalia_tabuleiro(t_grafo_tabuleiro grafotab, int area, int cores)
     int avaliacao = 0;
     avaliacao += (area - grafotab.grafo[0].area) * 1;
     avaliacao += grafotab.componentes_restantes * 1;
-    avaliacao += cores_restantes * 1;
+    avaliacao += cores_restantes * 5;
     avaliacao += grafotab.grafo[0].distancias[0] * 1; 
     avaliacao += grafotab.grafo[0].distancias[1] * 1;
-    avaliacao += grafotab.grafo[0].distancias[2] * 1;  
+    avaliacao += grafotab.grafo[0].distancias[2] * 2;  
 
     return avaliacao;
 }
