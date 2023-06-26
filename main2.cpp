@@ -23,7 +23,7 @@ int main(){
     t_tabuleiro tab;
  
     tab = le_tabuleiro();
-    cout << "tabuleiro matriz feito";
+    cout << "tabuleiro matriz feito!!";
 
     mat2graph(tab, grafotab.grafo);
     cout << "tabuleiro grafo feito";

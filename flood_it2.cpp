@@ -15,11 +15,11 @@ t_tabuleiro le_tabuleiro() {
     t_tabuleiro tab;
     FILE* tabuleiro;
 
-    cout << "oiiiiii";
+    // cout << "oiiiiii";
 
     // printf("Enter filename: ");
-    // scanf("%s", filename);
-    fgets(filename, 1024, stdin);
+    scanf("%s", filename);
+    // fgets(filename, 1024, stdin);
 
     cout << "oiiiiii";
 
