@@ -34,16 +34,22 @@ int main(){
     // ID = 2
     for (t_vertice vert : grafotab.grafo)
     {
-        vert.visitado = 0;
-
         if (vert.distancias[0] == 0)
         {
             dijkstra(vert.indice, grafotab.grafo, 0);
         }
+
+        for (t_vertice vert : grafotab.grafo)
+            vert.visitado = 0;
+
         if (vert.distancias[1] == 0)
         {
             dijkstra(vert.indice, grafotab.grafo, 1);
         }
+
+        for (t_vertice vert : grafotab.grafo)
+            vert.visitado = 0;
+
         if (vert.distancias[2] == 0)
         {
             dijkstra(vert.indice, grafotab.grafo, 2);

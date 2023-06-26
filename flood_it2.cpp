@@ -150,6 +150,7 @@ void mat2graph(t_tabuleiro& tab, vector<t_vertice>& grafo)
                 vert.distancias.push_back(-1);
                 vert.distancias.push_back(-1);
                 vert.distancias.push_back(-1);
+                vert.visitado = 0;
 
                 // anota se o vértice contém algum dos cantos
                 if (i == 0 && j == tab.col-1) vert.distancias[0] = 0;
@@ -274,10 +275,14 @@ int avalia_tabuleiro(t_grafo_tabuleiro grafotab, int area, int cores)
 
 void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto)
 {
+    printf("entrou dijkstra\n");
+
     vector<int> nao_visitados;
     for (int i=0; i < static_cast<int>(grafo.size()); i++)
         nao_visitados.push_back(i);
     
+    printf("colocou nao visitados");
+
     while(!nao_visitados.empty())
     {
         // indice nao_visitados, distancia
