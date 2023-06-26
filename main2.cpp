@@ -1,71 +1,80 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "flood_it2.h"
-#include "ia.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <limits.h>
+#include "flood_it2.h"
+// #include "ia.h"
 
 using namespace std;
 
 #define PROFUNDIDADE 3
 
 // mudar para hashmap? (no momento, nao pode tirar vertices do vetor para nao quebrar a indexacao dos vizinhos)
-vector<t_vertice> grafo;
+// vector<t_vertice> grafo;
+t_grafo_tabuleiro grafotab;
 
 vector<int> jogadas;
 
 int main(){
-    int ganhou = 0;
+    int fim = 0;
 
     t_tabuleiro tab;
  
     tab = le_tabuleiro();
 
-    t_grafo grafo;
-    mat2graph(tab, grafo);
+    mat2graph(tab, grafotab.grafo);
 
     // dijkstra cantos
     // SD = 0
     // IE = 1
     // ID = 2
-    for (t_vertice vert : grafo)
+    for (t_vertice vert : grafotab.grafo)
     {
+        vert.distancias.push_back(-1);
+        vert.distancias.push_back(-1);
+        vert.distancias.push_back(-1);
+
+        vert.visitado = 0;
+
         if (vert.distancias[0] == 0)
         {
-            dijkstra(vert.indice, grafo, 0);
+            dijkstra(vert.indice, grafotab.grafo, 0);
         }
         if (vert.distancias[1] == 0)
         {
-            dijkstra(vert.indice, grafo, 1);
+            dijkstra(vert.indice, grafotab.grafo, 1);
         }
         if (vert.distancias[2] == 0)
         {
-            dijkstra(vert.indice, grafo, 2);
+            dijkstra(vert.indice, grafotab.grafo, 2);
         }
     }
 
 
     // guarda quantos componentes de cada cor ainda restam
     // e também quantos componentes restam
-    vector<int> contadores_cores(tab.cor, 0); // ESSAS COISAS NAO TAO FUNCIONANDO AINDA AAAAAAAAAA TEM QUE TER UM PRA CADA GRAFO
-    int componentes_restantes = 0;
-    for (t_vertice v : grafo)
+    for (int i=0; i<tab.cor; i++)
+        grafotab.contadores_cores.push_back(0);
+
+    grafotab.componentes_restantes = 0;
+    for (t_vertice v : grafotab.grafo)
     {
-        contadores_cores[v.cor]++;
-        componentes_restantes++;
+        grafotab.contadores_cores[v.cor-1]++;
+        grafotab.componentes_restantes++;
     }
 
+    // area total do tabuleiro
     int area = tab.lin * tab.col;
 
 
     // gera sequencias de jogadas
-    vector<t_tentativa> grafos_tentativas; // grafos gerados apos considerar n jogadas, e as jogadas correspondentes
+    vector<t_grafo_tabuleiro> grafos_tentativas; // grafos gerados apos considerar n jogadas, e as jogadas correspondentes
     for (int i=1; i <= tab.cor; i++)
     {
         // nao faz sentido jogar a mesma cor do vertice principal ja
-        if (grafo[0].cor == i)
+        if (grafotab.grafo[0].cor == i)
             continue;
 
         vector<int> tentativa;
@@ -73,23 +82,23 @@ int main(){
         // ja comeca a tentativa de uma cor
         tentativa.push_back(i);
 
-        gera_grafos1(tentativa, grafo, grafos_tentativas, tab.cor, PROFUNDIDADE);
+        gera_grafos1(tentativa, grafotab, grafos_tentativas, tab.cor, PROFUNDIDADE);
     }
 
 
     // avaliar grafos gerados com a heurística
     // também verificar se algum ganhou ja
-    pair<int, int> melhor = (1, INT_MAX) // cor, pontuacao. Quanto menor a pontuacao, melhor
-    for (t_tentativa t : grafos_tentativas)
+    pair<int, int> melhor = make_pair(1, INT_MAX); // cor, pontuacao. Quanto menor a pontuacao, melhor
+    for (t_grafo_tabuleiro t : grafos_tentativas)
     {
-        ganhou = ganhou(grafos_tentativas[t].grafo[0], area);
-        if (ganhou)
+        fim = ganhou(t.grafo[0], area);
+        if (fim)
         {
-            jogadas = grafos_tentativas[t].passos
+            jogadas = t.passos;
             break;
         }
 
-        int avaliacao = avalia_tabuleiro(t.grafo[0]);
+        int avaliacao = avalia_tabuleiro(t, area, tab.cor);
 
         if (avaliacao < melhor.second)
         {
@@ -99,7 +108,7 @@ int main(){
     }
 
     // se já achou uma solucao vencedora nesses <PROFUNDIDADE> primeiros passos
-    if (ganhou)
+    if (fim)
     {
         for (int j : jogadas)
             cout << jogadas[j];
@@ -112,13 +121,13 @@ int main(){
 
     // eliminar os ruins
     vector<int> ruins;
-    for (int t=0; t < static_cast<int>(grafos_tentativas); t++)
+    for (int t=0; t < static_cast<int>(grafos_tentativas.size()); t++)
     {
-        if (grafos_tentativas[t].tentativa[0] != jogadas.back())
+        if (grafos_tentativas[t].passos[0] != jogadas.back())
             ruins.push_back(t);
 
         else // ja tira a jogada da sequencia de cada tentativa, ja que é a posicao 0 que é analisada sempre
-            grafos_tentativas[t].tentativas.erase(grafos_tentativas[t].tentativas.begin() + 0);
+            grafos_tentativas[t].passos.erase(grafos_tentativas[t].passos.begin() + 0);
     }
 
     for (int r : ruins)
@@ -130,34 +139,34 @@ int main(){
     // escolher o melhor
     // eliminar os ruins
     // ate acabar o jogo
-    while(!ganhou)
+    while(!fim)
     {
-        int tam_tentativas = static_cast<int>(grafos_tentativas); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
+        int tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
         for (int c=1; c <= tab.cor; c++)
         {
             for (int t=0; t < tam_tentativas; t++)
             {
-                t_tentativa nova_tentativa = grafos_tentativas[t];
-                nova_tentativa.tentativa.push_back(c);
-                flood(nova_tentativa.grafo, c);
+                t_grafo_tabuleiro nova_tentativa = grafos_tentativas[t];
+                nova_tentativa.passos.push_back(c);
+                flood(nova_tentativa, c);
                 grafos_tentativas.push_back(nova_tentativa);
 
-                ganhou = ganhou(nova_tentativa.grafo[0], area);
-                if (ganhou)
+                fim = ganhou(nova_tentativa.grafo[0], area);
+                if (fim)
                 {
                     // for (int c : nova_tentativa.tentativa)
                     // {
                     //     jogadas.push_back(c);
                     // }
                     // faz o mesmo que o loop, um append de vectors basicamente
-                    jogadas.insert(jogadas.end(), nova_tentativa.tentativa.begin(), nova_tentativa.tentativa.end());
+                    jogadas.insert(jogadas.end(), nova_tentativa.passos.begin(), nova_tentativa.passos.end());
                     break;
                 }
             }
-            if (ganhou)
+            if (fim)
                 break;
         }
-        if (ganhou)
+        if (fim)
             break;
 
         // eliminar as tentativas que geraram as novas, vindas do passo anterior
@@ -166,14 +175,14 @@ int main(){
 
 
         // avaliar grafos gerados com a heurística
-        pair<int, int> melhor = (1, INT_MAX) // cor, pontuacao. Quanto menor a pontuacao, melhor
-        for (t_tentativa t : grafos_tentativas)
+        pair<int, int> melhor = make_pair(1, INT_MAX); // cor, pontuacao. Quanto menor a pontuacao, melhor
+        for (t_grafo_tabuleiro t : grafos_tentativas)
         {
-            int avaliacao = avalia_tabuleiro(t.grafo[0]);
+            int avaliacao = avalia_tabuleiro(t, area, tab.cor);
 
             if (avaliacao < melhor.second)
             {
-                melhor.first = t.tentativa[0];
+                melhor.first = t.passos[0];
                 melhor.second = avaliacao;
             }
         }
@@ -183,13 +192,13 @@ int main(){
 
         // eliminar os ruins
         vector<int> ruins;
-        for (int t=0; t < static_cast<int>(grafos_tentativas); t++)
+        for (int t=0; t < static_cast<int>(grafos_tentativas.size()); t++)
         {
-            if (grafos_tentativas[t].tentativa[0] != jogadas.back())
+            if (grafos_tentativas[t].passos[0] != jogadas.back())
                 ruins.push_back(t);
 
             else // ja tira a jogada da sequencia de cada tentativa, ja que é a posicao 0 que é analisada sempre
-                grafos_tentativas[t].tentativas.erase(grafos_tentativas[t].tentativas.begin() + 0);
+                grafos_tentativas[t].passos.erase(grafos_tentativas[t].passos.begin() + 0);
         }
 
         for (int r : ruins)
