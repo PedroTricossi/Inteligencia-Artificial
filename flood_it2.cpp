@@ -17,11 +17,11 @@ t_tabuleiro le_tabuleiro() {
 
     // cout << "oiiiiii";
 
-    // printf("Enter filename: ");
+    printf("Digite o nome do arquivo: ");
     scanf("%s", filename);
     // fgets(filename, 1024, stdin);
 
-    cout << "oiiiiii";
+    // cout << "oiiiiii";
 
     tabuleiro = fopen(filename, "r");
     if (tabuleiro == NULL) {
@@ -29,14 +29,14 @@ t_tabuleiro le_tabuleiro() {
         exit(1);
     }
 
-    cout << "oiiiiii";
+    // cout << "oiiiiii";
 
     if (fscanf(tabuleiro, "%d%d%d", &tab.lin, &tab.col, &tab.cor) != 3) {
         printf("Invalid file format.\n");
         exit(1);
     }
 
-    cout << "reconheceu o arquivo ao menos";
+    // cout << "reconheceu o arquivo ao menos";
 
     // tab.tab = malloc(tab.lin * sizeof(t_cell*));
     tab.tab = (t_cell**)malloc(tab.lin * sizeof(t_cell*));
@@ -46,7 +46,7 @@ t_tabuleiro le_tabuleiro() {
         exit(1);
     }
 
-    cout << "alocou parcialmente";
+    // cout << "alocou parcialmente";
 
     // tab.tab[0] = malloc(tab.lin * tab.col * sizeof(t_cell));
     tab.tab[0] = (t_cell*)malloc(tab.lin * tab.col * sizeof(t_cell));
@@ -56,7 +56,7 @@ t_tabuleiro le_tabuleiro() {
         exit(1);
     }
 
-    cout << "alocou a memoria da matriz";
+    // cout << "alocou a memoria da matriz";
 
     for (i = 1; i < tab.lin; i++)
         tab.tab[i] = tab.tab[0] + i * tab.col;
@@ -187,6 +187,7 @@ int ganhou(t_vertice v, int area)
 
 void flood(t_grafo_tabuleiro& grafotab, int cor)
 {
+    // printf("entrou flood\n");
     // para poder manipular o vetor sem quebrar o loop
     vector<int> vizinhos = grafotab.grafo[0].vizinhos;
 
@@ -197,11 +198,13 @@ void flood(t_grafo_tabuleiro& grafotab, int cor)
         t_vertice vert_vizinho = grafotab.grafo[vizinhos[v]];
         if (vert_vizinho.cor == cor)
         {
+            // printf("floodar vertice\n");
             grafotab.componentes_restantes--;
             grafotab.contadores_cores[vert_vizinho.cor-1]--;
             grafotab.grafo[0].area += vert_vizinho.area;
 
             // atualiza distancias para os cantos
+            // printf("atualiza cantos\n");
             for (int i=0; i<3; i++)
             {
                 if (vert_vizinho.distancias[i] < grafotab.grafo[0].distancias[i])
@@ -210,10 +213,16 @@ void flood(t_grafo_tabuleiro& grafotab, int cor)
 
             // evitar de adicionar esse vertice novamente à vizinhança
             // no caso de ele ser vizinho de outro vizinho futuro
+            // printf("muda cor\n");
             grafotab.grafo[vizinhos[v]].cor = 0;
 
+            // printf("apaga da vizinhanca\n");
+            // printf("%d\n", vizinhos[v]);
             grafotab.grafo[0].vizinhos.erase(grafotab.grafo[0].vizinhos.begin() + v);
+            vizinhos.erase(vizinhos.begin() + v);
+            v--;
 
+            // printf("rouba vizinhanca dele\n");
             // adicionar vizinhanca do vertice floodado
             for (int viz_viz : vert_vizinho.vizinhos)
             {
@@ -223,6 +232,7 @@ void flood(t_grafo_tabuleiro& grafotab, int cor)
             }
         }
     }
+
 }
 
 void gera_grafos1(vector<int> tentativa, t_grafo_tabuleiro grafo_original, vector<t_grafo_tabuleiro>& grafos_tentativas, int cores, int profundidade)
@@ -242,12 +252,19 @@ void gera_grafos1(vector<int> tentativa, t_grafo_tabuleiro grafo_original, vecto
     else
     {
         t_grafo_tabuleiro novo_grafo = grafo_original;
-        
+        // cout << novo_grafo.componentes_restantes << endl;
         for (int c : tentativa)
+        {
+            // cout << c;
             flood(novo_grafo, c); // esse grafo é passado por referencia!
+        }
+        // cout << endl << novo_grafo.componentes_restantes << endl;
+        // cout << novo_grafo.grafo[0].area << endl;
+        // cout << endl;
 
         // grafos_tentativas.tentativa.passos.push_back(tentativa);
         novo_grafo.passos = tentativa;
+        // cout << novo_grafo.passos[0] << novo_grafo.passos[1] << novo_grafo.passos[2] << novo_grafo.passos[3] << endl << endl;
         grafos_tentativas.push_back(novo_grafo);
     }
 }
@@ -263,25 +280,25 @@ int avalia_tabuleiro(t_grafo_tabuleiro grafotab, int area, int cores)
     }
     
     int avaliacao = 0;
-    avaliacao += (area - grafotab.grafo[0].area);
-    avaliacao += grafotab.componentes_restantes;
-    avaliacao += cores_restantes;
-    avaliacao += grafotab.grafo[0].distancias[0]; 
-    avaliacao += grafotab.grafo[0].distancias[1];
-    avaliacao += grafotab.grafo[0].distancias[2];  
+    avaliacao += (area - grafotab.grafo[0].area) * 1;
+    avaliacao += grafotab.componentes_restantes * 1;
+    avaliacao += cores_restantes * 1;
+    avaliacao += grafotab.grafo[0].distancias[0] * 1; 
+    avaliacao += grafotab.grafo[0].distancias[1] * 1;
+    avaliacao += grafotab.grafo[0].distancias[2] * 1;  
 
     return avaliacao;
 }
 
-void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto)
+void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> grafo, int canto)
 {
-    printf("entrou dijkstra\n");
+    // printf("entrou dijkstra\n");
 
     vector<int> nao_visitados;
     for (int i=0; i < static_cast<int>(grafo.size()); i++)
         nao_visitados.push_back(i);
     
-    printf("colocou nao visitados");
+    // printf("colocou nao visitados\n");
 
     while(!nao_visitados.empty())
     {
@@ -289,8 +306,10 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto)
         pair<int, int> menor_dist = make_pair(0, grafo[nao_visitados[0]].distancias[canto]);
         // pair<int, int> menor_dist = ()
 
+        // printf("atribuiu par\n");
+
         // procura vertice com menor distancia entre os nao visitados
-        for (int nv : nao_visitados)
+        for (int nv=0; nv < static_cast<int>(nao_visitados.size()); nv++)
         {
             if (grafo[nao_visitados[nv]].distancias[canto] < menor_dist.second
                 || menor_dist.second == -1)
@@ -300,9 +319,13 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto)
             }
         }
 
+        // printf("achou menor vertice\n");
+
         int atual = nao_visitados[menor_dist.first];
 
+        // printf("apagar %d\n", menor_dist.second);
         nao_visitados.erase(nao_visitados.begin() + menor_dist.first);
+        // printf("\tapagou %d\n", menor_dist.second);
         grafo[atual].visitado = 1;
 
         for (int viz : grafo[atual].vizinhos)
@@ -312,7 +335,10 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto)
                 int nova_dist = grafo[atual].distancias[canto] + 1;
                 if (nova_dist < grafo[viz].distancias[canto]
                     || grafo[viz].distancias[canto] == -1)
+                {
                     grafo[viz].distancias[canto] = nova_dist;
+                    grafo_real[viz].distancias[canto] = nova_dist;
+                }
             }
         }
     }

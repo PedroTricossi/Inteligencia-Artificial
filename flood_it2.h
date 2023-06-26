@@ -61,6 +61,6 @@ void gera_grafos1(vector<int> tentativa, t_grafo_tabuleiro grafo_original, vecto
 
 int avalia_tabuleiro(t_grafo_tabuleiro grafotab, int area, int cores);
 
-void dijkstra(int ind_root, vector<t_vertice>& grafo, int canto);
+void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> grafo, int canto);
 
 #endif

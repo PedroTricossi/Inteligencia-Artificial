@@ -1,0 +1,29 @@
+# Inteligencia-Artificial
+Diretório criado para os trabalhos da disciplina de Inteligência Artificial da UFPR
+
+a implementação é feita com grafos, e faz uso de uma combinação de heurísticas (uma soma com pesos): 
+
+métricas heurísticas:
+    distância canto superior direito
+    distância canto inferior esquerdo (esse e o anterior são relevantes tb, uma vez que chegar no ID)
+    distância canto inferior direito
+    área pintada
+    quantidade de vértices pintados
+    cores restantes (importante no fim do jogo, pois reduzir uma cor é muito valioso)
+
+Para as distâncias: é executado dijkstra a partir de cada um dos cantos. Com isso,
+é possível obter a distância mínima do canto superior esquerdo para cada um dos  
+demais cantos.
+
+Área pintada: cada vértice têm o atributo da sua área.
+
+Quantidade de vértices pintados: contador simples
+
+cores restantes: vetor com um contadores para cada cor
+
+
+São verificadas <PROFUNDIDADE>+1 jogadas a frente, não considerando a mesma cor duas vezes na sequência.
+    
+Após verificar qual a melhor jogada, utiliza os grafos que foram gerados com ela para gerar os grafos das próximas jogadas a serem avaliadas, enquanto libera o espaço de todos os demais grafos.
+
+A implementação ignora o fato de poder jogar nos demais cantos, uma vez que concluimos, em sala e em particular, que praticamente nunca faria sentido jogar num canto diferente.
