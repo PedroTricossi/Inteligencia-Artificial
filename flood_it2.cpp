@@ -120,7 +120,7 @@ void liga_componente(int i, int j, t_tabuleiro& tab, t_vertice& vert, vector<t_v
     return;
 }
 
-void mat2graph(t_tabuleiro tab, vector<t_vertice>& grafo)
+void mat2graph(t_tabuleiro& tab, vector<t_vertice>& grafo)
 {
     for (int i=0; i < tab.lin; i++)
     {
