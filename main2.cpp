@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define PROFUNDIDADE 0
+#define PROFUNDIDADE 6
 
 // mudar para hashmap? (no momento, nao pode tirar vertices do vetor para nao quebrar a indexacao dos vizinhos)
 // vector<t_vertice> grafo;

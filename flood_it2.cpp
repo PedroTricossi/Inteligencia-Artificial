@@ -119,9 +119,21 @@ void liga_componente(int i, int j, t_tabuleiro& tab, t_vertice& vert, vector<t_v
     vert.area++;
 
     // anota se o vértice contém algum dos cantos
-    if (i == 0 && j == tab.col-1) vert.distancias[0] = 0;
-    else if (i == tab.lin-1 && j == 0) vert.distancias[1] = 0;
-    else if (i == tab.lin-1 && j == tab.col-1) vert.distancias[2] = 0;
+    if (i == 0 && j == tab.col-1)
+    {
+        vert.distancias[0] = 0;
+        // cout << "SD" << endl;
+    } 
+    else if (i == tab.lin-1 && j == 0)
+    {
+        vert.distancias[1] = 0;
+        // cout << "IE" << endl;
+    } 
+    else if (i == tab.lin-1 && j == tab.col-1)
+    {
+        vert.distancias[2] = 0;
+        // cout << "ID" << endl;
+    }
 
     // pode marcar a célula como visitada já
     // e parte do componente em questao
@@ -153,9 +165,21 @@ void mat2graph(t_tabuleiro& tab, vector<t_vertice>& grafo)
                 vert.visitado = 0;
 
                 // anota se o vértice contém algum dos cantos
-                if (i == 0 && j == tab.col-1) vert.distancias[0] = 0;
-                else if (i == tab.lin-1 && j == 0) vert.distancias[1] = 0;
-                else if (i == tab.lin-1 && j == tab.col-1) vert.distancias[2] = 0;
+                if (i == 0 && j == tab.col-1)
+                {
+                    vert.distancias[0] = 0;
+                    // cout << "SD" << endl;
+                } 
+                else if (i == tab.lin-1 && j == 0)
+                {
+                    vert.distancias[1] = 0;
+                    // cout << "IE" << endl;
+                } 
+                else if (i == tab.lin-1 && j == tab.col-1)
+                {
+                    vert.distancias[2] = 0;
+                    // cout << "ID" << endl;
+                }
 
                 // esquema para indicar a que componente os ja visitados pertencem
                 tab.tab[i][j].cor = (vert.indice + 1) * -1; //(vert.indice + 1) * -1; // considerar que as cores comecam em 1, indices em 0
@@ -304,16 +328,15 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> gra
     {
         // indice nao_visitados, distancia
         pair<int, int> menor_dist = make_pair(0, grafo[nao_visitados[0]].distancias[canto]);
-        // pair<int, int> menor_dist = ()
-
-        // printf("atribuiu par\n");
+        // printf("dist par %d\n", grafo[nao_visitados[0]].distancias[canto]);
 
         // procura vertice com menor distancia entre os nao visitados
         for (int nv=0; nv < static_cast<int>(nao_visitados.size()); nv++)
         {
-            if (grafo[nao_visitados[nv]].distancias[canto] < menor_dist.second
+            if (((grafo[nao_visitados[nv]].distancias[canto] < menor_dist.second) && menor_dist.second != -1 && grafo[nao_visitados[nv]].distancias[canto] != -1)
                 || menor_dist.second == -1)
             {
+                // printf("mudou!\n");
                 menor_dist.first = nv;
                 menor_dist.second = grafo[nao_visitados[nv]].distancias[canto];
             }
@@ -322,6 +345,7 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> gra
         // printf("achou menor vertice\n");
 
         int atual = nao_visitados[menor_dist.first];
+        // printf("dist atual: %d\n", grafo[atual].distancias[canto]);
 
         // printf("apagar %d\n", menor_dist.second);
         nao_visitados.erase(nao_visitados.begin() + menor_dist.first);
@@ -333,9 +357,12 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> gra
             if (grafo[viz].visitado == 0)
             {
                 int nova_dist = grafo[atual].distancias[canto] + 1;
-                if (nova_dist < grafo[viz].distancias[canto]
+                // printf("nova_dist: %d\n", grafo[atual].distancias[canto]);
+                if ((nova_dist < grafo[viz].distancias[canto]  && grafo[viz].distancias[canto] != -1)
                     || grafo[viz].distancias[canto] == -1)
                 {
+                    // if (nova_dist == 0)
+                        // printf("fudeu\n");
                     grafo[viz].distancias[canto] = nova_dist;
                     grafo_real[viz].distancias[canto] = nova_dist;
                 }

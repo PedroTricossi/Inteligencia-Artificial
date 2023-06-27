@@ -1,0 +1,121 @@
+componente cor: 1
+componente area: 4
+
+componente cor: 2
+componente area: 4
+
+componente cor: 3
+componente area: 4
+
+componente cor: 1
+componente area: 2
+
+componente cor: 2
+componente area: 1
+
+componente cor: 1
+componente area: 1
+
+entrou no loop
+tentativas:
+passou if
+33, 2
+
+passou if
+41, 3
+
+JOGOU: 2
+componente cor: 1
+componente area: 8
+
+componente cor: 0
+componente area: 4
+
+componente cor: 3
+componente area: 4
+
+componente cor: 1
+componente area: 2
+
+componente cor: 2
+componente area: 1
+
+componente cor: 1
+componente area: 1
+
+entrou no loop
+tentativas:
+passou if
+20, 3
+
+JOGOU: 3
+componente cor: 1
+componente area: 12
+
+componente cor: 0
+componente area: 4
+
+componente cor: 0
+componente area: 4
+
+componente cor: 1
+componente area: 2
+
+componente cor: 2
+componente area: 1
+
+componente cor: 1
+componente area: 1
+
+entrou no loop
+tentativas:
+passou if
+13, 2
+
+JOGOU: 2
+componente cor: 1
+componente area: 13
+
+componente cor: 0
+componente area: 4
+
+componente cor: 0
+componente area: 4
+
+componente cor: 1
+componente area: 2
+
+componente cor: 0
+componente area: 1
+
+componente cor: 1
+componente area: 1
+
+entrou no loop
+tentativas:
+passou if
+13, 3
+
+JOGOU: 1
+componente cor: 1
+componente area: 16
+
+componente cor: 0
+componente area: 4
+
+componente cor: 0
+componente area: 4
+
+componente cor: 0
+componente area: 2
+
+componente cor: 0
+componente area: 1
+
+componente cor: 0
+componente area: 1
+
+a 2
+a 3
+a 2
+a 1
