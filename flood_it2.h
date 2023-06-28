@@ -4,6 +4,8 @@
 #include <vector>
 using namespace std;
 
+extern int p1, p2, p3, p4, p5, p6;
+
 typedef struct 
 {
     int flood;
@@ -39,7 +41,7 @@ typedef struct
 }t_grafo_tabuleiro;
 
 
-t_tabuleiro le_tabuleiro(const char* filename);
+t_tabuleiro le_tabuleiro(const char* filename, int p1, int p2, int p3, int p4, int p5, int p6);
 
 int verifica_borda(t_tabuleiro *tab, int *x, int *y);
 
