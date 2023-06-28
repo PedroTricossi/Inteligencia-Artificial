@@ -209,45 +209,85 @@ int ganhou(t_vertice v, int area)
     return 0;
 }
 
+// void flood(t_grafo_tabuleiro& grafotab, int cor)
+// {
+//     // printf("entrou flood\n");
+//     // para poder manipular o vetor sem quebrar o loop
+//     vector<int> vizinhos = grafotab.grafo[0].vizinhos;
+
+//     // for (t_vertice viz : vizinhos)
+//     for (int v=0; v < static_cast<int>(vizinhos.size()); v++)
+//     {
+//         // grafotab.grafo[vizinhos[v]] é um vértice vizinho do vértice principal
+//         t_vertice vert_vizinho = grafotab.grafo[vizinhos[v]];
+//         if (vert_vizinho.cor == cor)
+//         {
+//             // printf("floodar vertice\n");
+//             grafotab.componentes_restantes--;
+//             grafotab.contadores_cores[vert_vizinho.cor-1]--;
+//             grafotab.grafo[0].area += vert_vizinho.area;
+
+//             // atualiza distancias para os cantos
+//             // printf("atualiza cantos\n");
+//             for (int i=0; i<3; i++)
+//             {
+//                 if (vert_vizinho.distancias[i] < grafotab.grafo[0].distancias[i])
+//                     grafotab.grafo[0].distancias[i] = vert_vizinho.distancias[i];
+//             }
+
+//             // evitar de adicionar esse vertice novamente à vizinhança
+//             // no caso de ele ser vizinho de outro vizinho futuro
+//             // printf("muda cor\n");
+//             grafotab.grafo[vizinhos[v]].cor = 0;
+
+//             // printf("apaga da vizinhanca\n");
+//             // printf("%d\n", vizinhos[v]);
+//             grafotab.grafo[0].vizinhos.erase(grafotab.grafo[0].vizinhos.begin() + v);
+//             vizinhos.erase(vizinhos.begin() + v);
+//             v--;
+
+//             // printf("rouba vizinhanca dele\n");
+//             // adicionar vizinhanca do vertice floodado
+//             for (int viz_viz : vert_vizinho.vizinhos)
+//             {
+//                 // verificar se já nao tem o vizinho
+//                 if (viz_viz != 0 && grafotab.grafo[viz_viz].cor != 0)
+//                     grafotab.grafo[0].vizinhos.push_back(viz_viz);
+//             }
+//         }
+//     }
+
+// }
+
 void flood(t_grafo_tabuleiro& grafotab, int cor)
 {
-    // printf("entrou flood\n");
     // para poder manipular o vetor sem quebrar o loop
-    vector<int> vizinhos = grafotab.grafo[0].vizinhos;
+    vector<int>& vizinhos = grafotab.grafo[0].vizinhos;
 
-    // for (t_vertice viz : vizinhos)
-    for (int v=0; v < static_cast<int>(vizinhos.size()); v++)
+    for (int v = static_cast<int>(vizinhos.size()) - 1; v >= 0; --v)
     {
         // grafotab.grafo[vizinhos[v]] é um vértice vizinho do vértice principal
-        t_vertice vert_vizinho = grafotab.grafo[vizinhos[v]];
+        t_vertice& vert_vizinho = grafotab.grafo[vizinhos[v]];
+
         if (vert_vizinho.cor == cor)
         {
-            // printf("floodar vertice\n");
             grafotab.componentes_restantes--;
-            grafotab.contadores_cores[vert_vizinho.cor-1]--;
+            grafotab.contadores_cores[vert_vizinho.cor - 1]--;
             grafotab.grafo[0].area += vert_vizinho.area;
 
             // atualiza distancias para os cantos
-            // printf("atualiza cantos\n");
-            for (int i=0; i<3; i++)
+            for (int i = 0; i < 3; i++)
             {
                 if (vert_vizinho.distancias[i] < grafotab.grafo[0].distancias[i])
                     grafotab.grafo[0].distancias[i] = vert_vizinho.distancias[i];
             }
 
             // evitar de adicionar esse vertice novamente à vizinhança
-            // no caso de ele ser vizinho de outro vizinho futuro
-            // printf("muda cor\n");
             grafotab.grafo[vizinhos[v]].cor = 0;
 
-            // printf("apaga da vizinhanca\n");
-            // printf("%d\n", vizinhos[v]);
-            grafotab.grafo[0].vizinhos.erase(grafotab.grafo[0].vizinhos.begin() + v);
+            // apaga da vizinhanca
             vizinhos.erase(vizinhos.begin() + v);
-            v--;
 
-            // printf("rouba vizinhanca dele\n");
-            // adicionar vizinhanca do vertice floodado
             for (int viz_viz : vert_vizinho.vizinhos)
             {
                 // verificar se já nao tem o vizinho
@@ -256,7 +296,6 @@ void flood(t_grafo_tabuleiro& grafotab, int cor)
             }
         }
     }
-
 }
 
 void gera_grafos1(vector<int> tentativa, t_grafo_tabuleiro grafo_original, vector<t_grafo_tabuleiro>& grafos_tentativas, int cores, int profundidade)
@@ -282,13 +321,9 @@ void gera_grafos1(vector<int> tentativa, t_grafo_tabuleiro grafo_original, vecto
             // cout << c;
             flood(novo_grafo, c); // esse grafo é passado por referencia!
         }
-        // cout << endl << novo_grafo.componentes_restantes << endl;
-        // cout << novo_grafo.grafo[0].area << endl;
-        // cout << endl;
 
-        // grafos_tentativas.tentativa.passos.push_back(tentativa);
         novo_grafo.passos = tentativa;
-        // cout << novo_grafo.passos[0] << novo_grafo.passos[1] << novo_grafo.passos[2] << novo_grafo.passos[3] << endl << endl;
+
         grafos_tentativas.push_back(novo_grafo);
     }
 }
@@ -370,3 +405,49 @@ void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> gra
         }
     }
 }
+
+// void dijkstra(int ind_root, vector<t_vertice>& grafo_real, vector<t_vertice> grafo, int canto)
+// {
+//     // Store indices of unvisited vertices
+//     vector<int> nao_visitados;
+//     nao_visitados.reserve(grafo.size());
+
+//     for (int i = 0; i < static_cast<int>(grafo.size()); i++)
+//         nao_visitados.push_back(i);
+
+//     while (!nao_visitados.empty())
+//     {
+//         // Find vertex with the smallest distance among the unvisited vertices
+//         int menor_dist_index = 0;
+//         int menor_dist_value = grafo[nao_visitados[0]].distancias[canto];
+
+//         for (int nv = 1; nv < static_cast<int>(nao_visitados.size()); nv++)
+//         {
+//             int dist_value = grafo[nao_visitados[nv]].distancias[canto];
+//             if ((dist_value < menor_dist_value || menor_dist_value == -1) && dist_value != -1)
+//             {
+//                 menor_dist_index = nv;
+//                 menor_dist_value = dist_value;
+//             }
+//         }
+
+//         // Process the vertex with the smallest distance
+//         int atual = nao_visitados[menor_dist_index];
+//         nao_visitados.erase(nao_visitados.begin() + menor_dist_index);
+//         grafo[atual].visitado = 1;
+
+//         // Update distances of neighboring vertices
+//         for (int viz : grafo[atual].vizinhos)
+//         {
+//             if (grafo[viz].visitado == 0)
+//             {
+//                 int nova_dist = grafo[atual].distancias[canto] + 1;
+//                 if ((nova_dist < grafo[viz].distancias[canto] && grafo[viz].distancias[canto] != -1) || grafo[viz].distancias[canto] == -1)
+//                 {
+//                     grafo[viz].distancias[canto] = nova_dist;
+//                     grafo_real[viz].distancias[canto] = nova_dist;
+//                 }
+//             }
+//         }
+//     }
+// }

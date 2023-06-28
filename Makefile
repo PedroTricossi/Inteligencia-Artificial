@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++11 -Wall -g
+CXXFLAGS = -std=c++11 -Wall -g -fopenmp
 
 # Source files
 SRCS = flood_it2.cpp main2.cpp

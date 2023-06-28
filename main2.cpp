@@ -4,12 +4,13 @@
 #include <vector>
 #include <algorithm>
 #include <limits.h>
+#include <omp.h>
 #include "flood_it2.h"
 // #include "ia.h"
 
 using namespace std;
 
-#define PROFUNDIDADE 6
+#define PROFUNDIDADE 1
 
 // mudar para hashmap? (no momento, nao pode tirar vertices do vetor para nao quebrar a indexacao dos vizinhos)
 // vector<t_vertice> grafo;
@@ -26,7 +27,7 @@ int main(int argc, char* argv[]){
     // cout << "tabuleiro matriz feito!!";
 
     mat2graph(tab, grafotab.grafo);
-    // cout << "tabuleiro grafo feito";
+    // printf("fez o tabuleiro\n");
 
     // dijkstra cantos
     // SD = 0
@@ -36,16 +37,19 @@ int main(int argc, char* argv[]){
     {
         if (vert.distancias[0] == 0)
         {
+            // cout << "dijk SD" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 0);
         }
 
         if (vert.distancias[1] == 0)
         {
+            // cout << "dijk IE" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 1);
         }
 
         if (vert.distancias[2] == 0)
         {
+            // cout << "dijk ID" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 2);
         }
     }
@@ -58,9 +62,12 @@ int main(int argc, char* argv[]){
     for (int i=0; i<tab.cor; i++)
         grafotab.contadores_cores.push_back(0);
 
+    // cout << "setou cores" << endl;
+    // cout << grafotab.grafo.size() << endl;
     grafotab.componentes_restantes = 0;
     for (t_vertice v : grafotab.grafo)
     {
+        // cout << v.indice << endl;
         grafotab.contadores_cores[v.cor-1]++;
         grafotab.componentes_restantes++;
     }
@@ -68,11 +75,16 @@ int main(int argc, char* argv[]){
     // area total do tabuleiro
     int area = tab.lin * tab.col;
 
-    // cout << "contadores setados";
     // printf("contadores setados\n");
+    // printf("contadores setados\n");
+
+    int numThreads = omp_get_max_threads();
+    printf("threads: %d\n", numThreads);
+    omp_set_num_threads(6);
 
     // gera sequencias de jogadas
     vector<t_grafo_tabuleiro> grafos_tentativas; // grafos gerados apos considerar n jogadas, e as jogadas correspondentes
+    // #pragma omp parallel for
     for (int i=1; i <= tab.cor; i++)
     {
         // nao faz sentido jogar a mesma cor do vertice principal ja
@@ -85,8 +97,16 @@ int main(int argc, char* argv[]){
         tentativa.push_back(i);
         // cout << tentativa[0] << endl;
 
-        gera_grafos1(tentativa, grafotab, grafos_tentativas, tab.cor, PROFUNDIDADE);
+        // #pragma omp critical
+        // {
+        //     #pragma omp task
+        //     {
+                gera_grafos1(tentativa, grafotab, grafos_tentativas, tab.cor, PROFUNDIDADE);
+        //     }
+        // }
     }
+
+    #pragma omp taskwait
 
     // cout << "sequencias iniciais geradas";
     // printf("sequencias iniciais geradas\n");
@@ -171,46 +191,49 @@ int main(int argc, char* argv[]){
     // escolher o melhor
     // eliminar os ruins
     // ate acabar o jogo
-    while(!fim)
+    while (!fim)
     {
-        // cout << "entrou no loop";
-        // printf("entrou no loop\n");
+        int tam_tentativas = static_cast<int>(grafos_tentativas.size());
+        bool found_solution = false; // Declare a local flag for each parallel thread
 
-        int tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
-        // printf("tentativas: %d\n", tam_tentativas);
-        for (int c=1; c <= tab.cor; c++)
+        // printf("oiiiiiiiiii\n");
+        #pragma omp parallel shared(fim, grafos_tentativas, jogadas, found_solution)
         {
-            for (int t=0; t < tam_tentativas; t++)
+            #pragma omp for schedule(dynamic)
+            for (int c = 1; c <= tab.cor; c++)
             {
-                // printf("checa ultima jogada\n");
-                if (grafos_tentativas[t].passos.back() == c)
-                    continue;
+                if (found_solution)
+                    continue; // Skip iteration if a solution has been found
 
-                t_grafo_tabuleiro nova_tentativa = grafos_tentativas[t];
-                nova_tentativa.passos.push_back(c);
-                // printf("vai floodar\n");
-                flood(nova_tentativa, c);
-                // printf("floodou\n");
-                grafos_tentativas.push_back(nova_tentativa);
-                // printf("pushou np vetor\n");
-
-                fim = ganhou(nova_tentativa.grafo[0], area);
-                // printf("viu se ganhou\n");
-                if (fim)
+                for (int t = 0; t < tam_tentativas; t++)
                 {
-                    // printf("\nGANHOU\n");
-                    // for (int c : nova_tentativa.tentativa)
-                    // {
-                    //     jogadas.push_back(c);
-                    // }
-                    // faz o mesmo que o loop, um append de vectors basicamente
-                    jogadas.insert(jogadas.end(), nova_tentativa.passos.begin(), nova_tentativa.passos.end());
-                    break;
+                    if (grafos_tentativas[t].passos.back() == c)
+                        continue;
+
+                    t_grafo_tabuleiro nova_tentativa = grafos_tentativas[t];
+                    nova_tentativa.passos.push_back(c);
+                    flood(nova_tentativa, c);
+                    #pragma omp critical
+                    {
+                        // printf("tamanho grafo: %d\n", nova_tentativa.grafo.size());
+                        grafos_tentativas.push_back(nova_tentativa);
+                        // printf("pushou tentativa\n");
+                    }
+
+                    if (ganhou(nova_tentativa.grafo[0], area))
+                    {
+                        #pragma omp critical
+                        {
+                            fim = true;
+                            found_solution = true; // Set the flag for this thread
+                            jogadas.insert(jogadas.end(), nova_tentativa.passos.begin(), nova_tentativa.passos.end());
+                        }
+                        break; // Exit the inner loop
+                    }
                 }
             }
-            if (fim)
-                break;
         }
+
         if (fim)
             break;
 
@@ -230,23 +253,33 @@ int main(int argc, char* argv[]){
 
         // avaliar grafos gerados com a heurística
         pair<int, int> melhor = make_pair(1, INT_MAX); // cor, pontuacao. Quanto menor a pontuacao, melhor
-        for (t_grafo_tabuleiro t : grafos_tentativas)
-        {
-            int avaliacao = avalia_tabuleiro(t, area, tab.cor);
+        // pair<int, int> global_melhor = melhor;
 
-            if (avaliacao < melhor.second)
+        // for (auto tentativa : grafos_tentativas)
+        // {
+        //     printf("area %d\n", tentativa.grafo.size());
+        //     // printf
+        // }
+
+        for (int i = 0; i < tam_tentativas; i++)
+        {
+            // printf("avalia %d\n", i);
+            int avaliacao = avalia_tabuleiro(grafos_tentativas[i], area, tab.cor);
+            // #pragma omp critical
             {
-                melhor.first = t.passos[0];
-                melhor.second = avaliacao;
+                if (avaliacao < melhor.second)
+                {
+                    melhor.first = grafos_tentativas[i].passos[0];
+                    melhor.second = avaliacao;
+                }
             }
         }
 
-        // cout << "avaliadas dentro do loop";
-        // printf("avaliadas dentro do loop\n");
+        // printf("avaliou\n");
 
-        // // guarda a melhor jogada
-        // jogadas.pop_back();
+        // guarda a melhor jogada
         jogadas.push_back(melhor.first);
+        printf("jogou: %d\n", jogadas.back());
 
         // eliminar os ruins
         auto it = grafos_tentativas.begin();
