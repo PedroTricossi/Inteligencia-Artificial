@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int profundidade = 0;
+int profundidade = 1;
 
 // mudar para hashmap? (no momento, nao pode tirar vertices do vetor para nao quebrar a indexacao dos vizinhos)
 // vector<t_vertice> grafo;
@@ -190,22 +190,34 @@ int main(int argc, char* argv[]){
         #pragma omp parallel shared(fim, grafos_tentativas, jogadas, found_solution)
         {
             #pragma omp for schedule(dynamic)
-            for (int c = 1; c <= tab.cor; c++)
+            // for (int c = 1; c <= tab.cor; c++)
+            for (int t = 0; t < tam_tentativas; t++)
             {
                 if (found_solution)
                     continue; // Skip iteration if a solution has been found
 
-                for (int t = 0; t < tam_tentativas; t++)
+                // for (int t = 0; t < tam_tentativas; t++)
+                for (int v = 0; v < static_cast<int>(grafos_tentativas[t].grafo[0].vizinhos.size()); v++)
                 {
-                    if (grafos_tentativas[t].passos.back() == c)
+                    printf("oi1\n");
+                    int id_v = grafos_tentativas[t].grafo[0].vizinhos[v];
+                    printf("oi2\n");
+                    int cor = grafos_tentativas[t].grafo[id_v].cor;
+                    printf("oi3\n");
+                    if (grafos_tentativas[t].passos.back() == cor)
                         continue;
 
+                    if (v > 3)
+                        break;
+
                     t_grafo_tabuleiro nova_tentativa = grafos_tentativas[t];
-                    nova_tentativa.passos.push_back(c);
-                    flood(nova_tentativa, c);
+                    nova_tentativa.passos.push_back(cor);
+                    flood(nova_tentativa, cor);
                     #pragma omp critical
                     {
+                        printf("oi4, %d\n", omp_get_thread_num());
                         grafos_tentativas.push_back(nova_tentativa);
+                        printf("oi5\n");
                     }
 
                     if (ganhou(nova_tentativa.grafo[0], area))
@@ -215,6 +227,7 @@ int main(int argc, char* argv[]){
                             fim = true;
                             found_solution = true; // Set the flag for this thread
                             jogadas.insert(jogadas.end(), nova_tentativa.passos.begin(), nova_tentativa.passos.end());
+                            printf("oi6\n");
                         }
                         break; // Exit the inner loop
                     }
@@ -229,9 +242,9 @@ int main(int argc, char* argv[]){
         // for (int i=0; i < tam_tentativas; i++)
         grafos_tentativas.erase(grafos_tentativas.begin(), grafos_tentativas.begin() + tam_tentativas);
 
-        // printf("descartou os antigos\n");
+        printf("descartou os antigos\n");
         tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
-        // printf("tentativas: %d\n", tam_tentativas);
+        printf("tentativas: %d\n", tam_tentativas);
         if (!tam_tentativas) break;
 
         // avaliar grafos gerados com a heurística
@@ -240,7 +253,7 @@ int main(int argc, char* argv[]){
 
         for (int i = 0; i < tam_tentativas; i++)
         {
-            // printf("avalia %d\n", i);
+            printf("avalia %d\n", i);
             int avaliacao = avalia_tabuleiro(grafos_tentativas[i], area, tab.cor);
             // #pragma omp critical
             {
@@ -252,11 +265,11 @@ int main(int argc, char* argv[]){
             }
         }
 
-        // printf("avaliou\n");
+        printf("avaliou\n");
 
         // guarda a melhor jogada
         jogadas.push_back(melhor.first);
-        // printf("jogou: %d\n", jogadas.back());
+        printf("jogou: %d\n", jogadas.back());
 
         // eliminar os ruins
         auto it = grafos_tentativas.begin();
@@ -271,9 +284,7 @@ int main(int argc, char* argv[]){
                 ++it;
             }
         }
-
        
-        tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
     }
 
     // printf("\nGANHOU\n");
