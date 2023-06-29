@@ -187,12 +187,13 @@ int main(int argc, char* argv[]){
         int tam_tentativas = static_cast<int>(grafos_tentativas.size());
         bool found_solution = false; // Declare a local flag for each parallel thread
 
-        #pragma omp parallel shared(fim, grafos_tentativas, jogadas, found_solution)
+        // #pragma omp parallel shared(fim, grafos_tentativas, jogadas, found_solution)
         {
-            #pragma omp for schedule(dynamic)
+            // #pragma omp for schedule(dynamic)
             // for (int c = 1; c <= tab.cor; c++)
             for (int t = 0; t < tam_tentativas; t++)
             {
+                printf("oi15\n");
                 if (found_solution)
                     continue; // Skip iteration if a solution has been found
 
@@ -210,27 +211,32 @@ int main(int argc, char* argv[]){
                     if (v > 3)
                         break;
 
+                    printf("oi6, %d\n", omp_get_thread_num());
                     t_grafo_tabuleiro nova_tentativa = grafos_tentativas[t];
+                    printf("oi7, %d\n", omp_get_thread_num());
                     nova_tentativa.passos.push_back(cor);
                     flood(nova_tentativa, cor);
-                    #pragma omp critical
+                    // #pragma omp critical
                     {
                         printf("oi4, %d\n", omp_get_thread_num());
                         grafos_tentativas.push_back(nova_tentativa);
                         printf("oi5\n");
                     }
-
-                    if (ganhou(nova_tentativa.grafo[0], area))
+                    printf("oi: %d %d\n", nova_tentativa.grafo[0].area, area);
+                    // if (ganhou(nova_tentativa.grafo[0], area))
+                    if(nova_tentativa.grafo[0].area == area)
                     {
-                        #pragma omp critical
+                        printf("oi8\n");
+                        // #pragma omp critical
                         {
                             fim = true;
                             found_solution = true; // Set the flag for this thread
                             jogadas.insert(jogadas.end(), nova_tentativa.passos.begin(), nova_tentativa.passos.end());
-                            printf("oi6\n");
+                            printf("oi9\n");
                         }
                         break; // Exit the inner loop
                     }
+                    printf("oi10\n");
                 }
             }
         }
@@ -240,7 +246,9 @@ int main(int argc, char* argv[]){
 
         // eliminar as tentativas que geraram as novas, vindas do passo anterior
         // for (int i=0; i < tam_tentativas; i++)
+        printf("oi11\n");
         grafos_tentativas.erase(grafos_tentativas.begin(), grafos_tentativas.begin() + tam_tentativas);
+        printf("oi12\n");
 
         printf("descartou os antigos\n");
         tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
