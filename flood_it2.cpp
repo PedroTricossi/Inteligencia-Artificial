@@ -14,7 +14,7 @@ int p2 = 2;
 int p3 = 100;
 int p4 = 1;
 int p5 = 1;
-int p6 = 3;
+int p6 = 75;
 
 // Cria um tabuleiro de flood-it usando como base as informacoes do enunciado do trabalho
 t_tabuleiro le_tabuleiro(const char* filename, int p1, int p2, int p3, int p4, int p5, int p6) {

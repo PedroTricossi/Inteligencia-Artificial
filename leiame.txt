@@ -4,7 +4,9 @@ Diretório criado para os trabalhos da disciplina de Inteligência Artificial da
 para executar: ./flood <arquivo_de_entrada> [profundidade p1 p2 p3 p4 p5 p6]
 
 em que p[1-6] são os pesos dados às heurísticas, explicadas a seguir. Se não forem
-definidos pelo usuário, esses pesos são por padrão [1 1 5 1 1 2]
+definidos pelo usuário, esses pesos são por padrão [1 2 100 1 1 75]
+
+a profundidade padrão é definida para 2
 
 a implementação é feita com grafos, e faz uso de uma combinação de heurísticas (uma soma com pesos): 
 
