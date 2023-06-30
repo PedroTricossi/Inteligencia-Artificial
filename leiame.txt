@@ -1,17 +1,20 @@
 # Inteligencia-Artificial
 Diretório criado para os trabalhos da disciplina de Inteligência Artificial da UFPR
 
-para executar: ./flood <arquivo_de_entrada>
+para executar: ./flood <arquivo_de_entrada> [profundidade p1 p2 p3 p4 p5 p6]
+
+em que p[1-6] são os pesos dados às heurísticas, explicadas a seguir. Se não forem
+definidos pelo usuário, esses pesos são por padrão [1 1 5 1 1 2]
 
 a implementação é feita com grafos, e faz uso de uma combinação de heurísticas (uma soma com pesos): 
 
 métricas heurísticas:
-    área pintada (peso 1)
-    quantidade de vértices pintados (peso 1)
-    cores restantes (importante no fim do jogo, pois reduzir uma cor é muito valioso) (peso 5)
-    distância canto superior direito (peso 1)
-    distância canto inferior esquerdo (esse e o anterior são relevantes tb, uma vez que chegar no ID) (peso 1)
-    distância canto inferior direito (peso 2)
+    área pintada 
+    quantidade de vértices pintados
+    cores restantes (importante no fim do jogo, pois reduzir uma cor é muito valioso) 
+    distância mínima canto superior direito 
+    distância mínima canto inferior esquerdo (esse e o anterior são relevantes tb, uma vez que chegar no ID)
+    distância mínima canto inferior direito 
 
 Para as distâncias: é executado dijkstra a partir de cada um dos cantos. Com isso,
 é possível obter a distância mínima do canto superior esquerdo para cada um dos  
@@ -24,8 +27,14 @@ Quantidade de vértices pintados: contador simples
 cores restantes: vetor com um contadores para cada cor
 
 
-São verificadas <PROFUNDIDADE>+1 jogadas a frente, não considerando a mesma cor duas vezes na sequência.
+São verificadas <PROFUNDIDADE>+1 jogadas a frente, não considerando nunca a mesma cor duas vezes na sequência.
+As cores consideradas são as dos vizinhos do vértice principal.
     
 Após verificar qual a melhor jogada, utiliza os grafos que foram gerados com ela para gerar os grafos das próximas jogadas a serem avaliadas, enquanto libera o espaço de todos os demais grafos.
 
 A implementação ignora o fato de poder jogar nos demais cantos, uma vez que concluimos, em sala e em particular, que praticamente nunca faria sentido jogar num canto diferente.
+
+há duas implementações (main2.cpp e main3.cpp)
+a diferença é que em main3, olha-se <PROFUNDIDADE>+1 lances à frente, e quando um dos tabuleiros
+resultantes é avaliado como o melhor, todas as jogadas até ele são executadas. Isso torna o programa
+mais ágil, embora perca um pouco de precisão (essa é a implementação no Makefile)

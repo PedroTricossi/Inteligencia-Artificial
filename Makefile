@@ -2,10 +2,10 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++11 -Wall -g -fopenmp
+CXXFLAGS = -std=c++11 -Wall -g -fopenmp -O2 -O3
 
 # Source files
-SRCS = flood_it2.cpp main2.cpp
+SRCS = flood_it2.cpp main3.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

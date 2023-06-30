@@ -11,6 +11,7 @@
 using namespace std;
 
 int profundidade = 2;
+int poda = 5;
 
 // vector<t_vertice> grafo;
 t_grafo_tabuleiro grafotab;
@@ -58,24 +59,36 @@ int main(int argc, char* argv[]){
     {
         if (vert.distancias[0] == 0)
         {
-            // cout << "dijk SD" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 0);
         }
 
         if (vert.distancias[1] == 0)
         {
-            // cout << "dijk IE" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 1);
         }
 
         if (vert.distancias[2] == 0)
         {
-            // cout << "dijk ID" << endl;
             dijkstra(vert.indice, grafotab.grafo, grafotab.grafo, 2);
         }
     }
-    // cout << "passou dos dijkstra";
-    // printf("passou dijkstra\n");
+
+    for (auto v = grafotab.grafo[0].vizinhos.begin(); v != grafotab.grafo[0].vizinhos.end(); v++)
+    {
+        if (grafotab.grafo[*v].distancias[0] <= grafotab.grafo[0].distancias[0])
+            grafotab.grafo[0].distancias[0] = grafotab.grafo[*v].distancias[0] + 1;
+
+        if (grafotab.grafo[*v].distancias[1] <= grafotab.grafo[0].distancias[1])
+            grafotab.grafo[0].distancias[1] = grafotab.grafo[*v].distancias[1] + 1;
+
+        if (grafotab.grafo[*v].distancias[2] <= grafotab.grafo[0].distancias[2])
+            grafotab.grafo[0].distancias[2] = grafotab.grafo[*v].distancias[2] + 1;
+    }
+
+    printf("distancia minima SD: %d\n", grafotab.grafo[0].distancias[0]);
+    printf("distancia minima IE: %d\n", grafotab.grafo[0].distancias[1]);
+    printf("distancia minima ID: %d\n", grafotab.grafo[0].distancias[2]);
+
     // printf("%d %d %d\n", grafotab.grafo[0].distancias[0], grafotab.grafo[0].distancias[1], grafotab.grafo[0].distancias[2]);
 
     // guarda quantos componentes de cada cor ainda restam
@@ -131,14 +144,6 @@ int main(int argc, char* argv[]){
         gera_grafos1(tentativa, grafotab, grafos_tentativas, tab.cor, profundidade);
     }
 
-    // flood(grafotab, 3);
-    // flood(grafotab, 2);
-    // printf("area %d\n", grafotab.grafo[0].area);
-    // for (auto v = grafotab.grafo[0].vizinhos.begin(); v != grafotab.grafo[0].vizinhos.end(); v++)
-    // {
-    //     printf("%d %d\n", grafotab.grafo[*v].indice, grafotab.grafo[*v].cor);
-    // }
-    // while(1);
 
     // avaliar grafos gerados com a heurística
     // também verificar se algum ganhou ja ganhou
@@ -209,8 +214,6 @@ int main(int argc, char* argv[]){
         // #pragma omp parallel shared(fim, vec_tentativas, jogadas, found_solution)
         {
             // #pragma omp for schedule(dynamic)
-            // for (int c = 1; c <= tab.cor; c++)
-            // for (int t = 0; t < tam_tentativas; t++)
             for (auto tenta : grafos_tentativas) // para cada tentativa
             {
 
@@ -231,7 +234,7 @@ int main(int argc, char* argv[]){
                     cores_usadas[tenta.grafo[v].cor - 1] = 1;
 
 
-                    if (conta_vizinhos > 2)
+                    if (conta_vizinhos >= poda)
                     {
                         // printf("limite vizinhos\n");
                         break;
@@ -275,11 +278,6 @@ int main(int argc, char* argv[]){
 
         tam_tentativas = static_cast<int>(grafos_tentativas.size()); // adicionar elementos nao vai quebrar o loop, guarda informacao para eliminar os de antes tambem
         // printf("tentativas: %d\n", tam_tentativas);
-
-        // for (int i = 0; i < tam_tentativas; i++)
-        // {
-        //     printf("\tprimeira da squencia: %d\n", grafos_tentativas[i].passos[0]);
-        // }
 
         if (!tam_tentativas) break;
 
